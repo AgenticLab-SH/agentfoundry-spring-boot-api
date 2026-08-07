@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI Agent 자산·서비스·교육·프로젝트를 조건으로 연결하는 AgentFoundry REST API 데모">
+  <title>AgentFoundry · Agent 생태계 매칭</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2218%22 fill=%22%2365e6bd%22/><text x=%2213%22 y=%2241%22 font-size=%2226%22 font-family=%22Arial%22 font-weight=%22900%22 fill=%22%23070b16%22>AF</text></svg>">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="AgentFoundry 처음으로">
+      <span class="brand-mark">AF</span>
+      <span><strong>AgentFoundry</strong><small>Agent assets · services · collaboration</small></span>
+    </a>
+    <nav aria-label="개발 도구">
+      <a href="/swagger-ui.html" target="_blank" rel="noreferrer">Swagger API</a>
+      <a href="/h2-console" target="_blank" rel="noreferrer">H2 Console</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-copy-wrap">
+        <p class="eyebrow">EXPLAINABLE AGENT MATCHING</p>
+        <h1 id="heroTitle">Agent를 찾고,<br><span>근거로 연결합니다.</span></h1>
+        <p class="hero-copy">지침·Skill·Loop·Context·Harness를 Agent Card로 비교하고, 목적·환경·리소스·예산이 맞는 참여를 시작합니다.</p>
+        <div class="hero-actions">
+          <a class="primary-link" href="#registry">Agent Card 보기</a>
+          <a class="secondary-link" href="#matchLab">매칭 실험하기</a>
+        </div>
+      </div>
+      <aside class="agent-card-principle" aria-label="Agent Card 핵심 정보">
+        <p class="mini-label">AGENT CARD STANDARD</p>
+        <ol>
+          <li><span>01</span><strong>목적·도메인</strong><small>무엇에 쓰는가</small></li>
+          <li><span>02</span><strong>환경·리소스</strong><small>어디서 실행하는가</small></li>
+          <li><span>03</span><strong>비용·투입</strong><small>무엇이 필요한가</small></li>
+          <li><span>04</span><strong>검증 기준</strong><small>언제 완료인가</small></li>
+        </ol>
+        <p class="principle-note">추천 점수는 항목별 근거를 함께 반환합니다.</p>
+      </aside>
+    </section>
+
+    <section class="account-panel" aria-labelledby="accountTitle">
+      <div class="section-heading compact">
+        <div><p class="eyebrow">DEMO IDENTITY</p><h2 id="accountTitle">계정과 참여 크레딧</h2></div>
+        <span class="status-pill" id="accountStatus">로그인 전</span>
+      </div>
+      <form id="loginForm" class="login-form">
+        <label>데모 계정
+          <select id="memberId">
+            <option value="demo_requester">데모 요청자 · 매칭/참여</option>
+            <option value="agent_maker">에이전트 메이커 · 완료 처리</option>
+            <option value="low_credit">크레딧 부족 오류</option>
+            <option value="project_provider">프로젝트 빌더 · 협업 제공</option>
+            <option value="experienced_user">참여 경험 사용자 · 추천 확인</option>
+          </select>
+        </label>
+        <label>비밀번호<input id="password" type="password" value="demo1234" autocomplete="current-password"></label>
+        <button class="primary-button" type="submit">로그인</button>
+      </form>
+      <div id="memberCard" class="member-card" hidden>
+        <div><small>현재 사용자</small><strong id="memberName"></strong><span id="memberCode"></span></div>
+        <div class="credit-balance"><small>참여 크레딧</small><strong id="creditBalance">0</strong><em>C</em></div>
+        <button class="secondary-button" id="logoutButton" type="button">로그아웃</button>
+      </div>
+    </section>
+
+    <section id="registry" class="content-section" aria-labelledby="registryTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">AGENT REGISTRY</p><h2 id="registryTitle">비교 가능한 Agent Card</h2></div>
+        <p>키워드와 구조화된 조건으로 자산·서비스·교육·프로젝트를 조회합니다.</p>
+      </div>
+      <form id="filterForm" class="filters">
+        <label class="search-field"><span class="sr-only">Agent Card 검색</span><input id="keyword" type="search" placeholder="Agent Card 검색"></label>
+        <label><span class="sr-only">등록 유형</span><select id="listingType"><option value="">모든 등록 유형</option><option>ASSET</option><option>BUILD_SERVICE</option><option>EDUCATION</option><option>PROJECT</option><option>KNOWLEDGE</option></select></label>
+        <label><span class="sr-only">구성 유형</span><select id="artifactType"><option value="">모든 구성</option><option>INSTRUCTION</option><option>SKILL</option><option>LOOP</option><option>CONTEXT</option><option>HARNESS</option><option>FULL_AGENT</option></select></label>
+        <label><span class="sr-only">도메인</span><select id="domain"><option value="">모든 도메인</option><option>DEVELOPMENT</option><option>DATA</option><option>CONTENT</option><option>OPERATIONS</option><option>EDUCATION</option><option>BUSINESS</option></select></label>
+        <button class="secondary-button" type="submit">조건 적용</button>
+      </form>
+      <div class="loading-card" id="offeringLoading">Agent Card를 불러오는 중입니다.</div>
+      <div class="offering-grid" id="offeringGrid" hidden></div>
+      <div class="empty-card" id="offeringEmpty" hidden>조건에 맞는 Agent Card가 없습니다.</div>
+    </section>
+
+    <section id="matchLab" class="content-section match-section" aria-labelledby="matchTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">MATCH LAB</p><h2 id="matchTitle">요청별 호환도 근거</h2></div>
+        <p>외부 AI 없이 Java 규칙이 유형·도메인·리소스·예산·신뢰도를 100점으로 계산합니다.</p>
+      </div>
+      <div class="match-toolbar">
+        <label>내 Agent Request<select id="requestSelect"><option value="">로그인 후 요청을 선택하세요</option></select></label>
+        <button class="primary-button" id="findMatches" type="button" disabled>매칭 계산</button>
+      </div>
+      <div id="requestBrief" class="request-brief" hidden></div>
+      <div id="matchList" class="match-list"><p class="muted">데모 요청자로 로그인하면 매칭 점수와 근거를 확인할 수 있습니다.</p></div>
+    </section>
+
+    <section class="dashboard-grid" aria-label="내 활동과 크레딧 원장">
+      <article class="dashboard-card">
+        <div class="card-heading"><div><p class="eyebrow">MY ENGAGEMENTS</p><h2>내 참여</h2></div><button class="icon-button" id="refreshEngagements" type="button" aria-label="참여 새로고침">↻</button></div>
+        <div id="engagementList" class="stack-list"><p class="muted">로그인하면 요청자·제공자 관점의 참여를 확인할 수 있습니다.</p></div>
+      </article>
+      <article class="dashboard-card">
+        <div class="card-heading"><div><p class="eyebrow">CREDIT LEDGER</p><h2>변동 원장</h2></div><button class="icon-button" id="refreshCredits" type="button" aria-label="원장 새로고침">↻</button></div>
+        <div id="creditList" class="stack-list"><p class="muted">로그인하면 차감·환급·제공자 보상의 처리 후 잔액을 확인할 수 있습니다.</p></div>
+      </article>
+    </section>
+  </main>
+
+  <footer>과제 검증용 가상 데이터입니다. 실제 Agent 실행·결제·수익·품질 보증을 제공하지 않습니다.</footer>
+
+  <dialog id="actionDialog">
+    <form method="dialog" class="dialog-card">
+      <p class="eyebrow" id="dialogEyebrow">CONFIRM ACTION</p>
+      <h2 id="dialogTitle">작업을 확인해 주세요.</h2>
+      <p id="dialogDescription"></p>
+      <label id="recommendationField" hidden>추천 의견<textarea id="recommendationComment" rows="4" maxlength="300" placeholder="검증 기준과 결과가 어땠는지 남겨 주세요."></textarea></label>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel">돌아가기</button><button class="primary-button" id="confirmAction" value="default">계속</button></div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
