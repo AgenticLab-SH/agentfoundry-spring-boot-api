@@ -175,6 +175,28 @@ class ApiContractIntegrationTest {
     }
 
     @Test
+    @DisplayName("다른 회원은 Offering을 보관하거나 Request를 취소할 수 없다")
+    void nonOwnersCannotArchiveOfferingOrCancelRequest() throws Exception {
+        MockHttpSession requesterSession = login("demo_requester", "demo1234");
+
+        mockMvc.perform(delete("/api/offerings/101").session(requesterSession))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mockMvc.perform(get("/api/offerings/101"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.status").value("OPEN"));
+
+        MockHttpSession providerSession = login("agent_maker", "demo1234");
+
+        mockMvc.perform(delete("/api/requests/201").session(providerSession))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mockMvc.perform(get("/api/requests/201"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.status").value("OPEN"));
+    }
+
+    @Test
     @DisplayName("로그인하지 않은 참여 생성은 401이다")
     void engagementRequiresLogin() throws Exception {
         mockMvc.perform(post("/api/engagements")
