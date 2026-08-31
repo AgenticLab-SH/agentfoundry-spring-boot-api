@@ -1,5 +1,7 @@
 # AgentFoundry
 
+[![CI](https://github.com/AgenticLab-SH/agentfoundry-spring-boot-api/actions/workflows/ci.yml/badge.svg)](https://github.com/AgenticLab-SH/agentfoundry-spring-boot-api/actions/workflows/ci.yml)
+
 AI Agent 자산·구축 서비스·교육·프로젝트 협업을 Agent Card로 등록하고, 사용자의
 목적·환경·리소스·예산과 맞는 항목을 설명 가능한 점수로 연결하는 Spring Boot REST
 API 과제 프로젝트입니다.
@@ -29,6 +31,18 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew bootRun
 - H2 Console: <http://localhost:8080/h2-console>
 
 H2 JDBC URL은 `jdbc:h2:mem:agentfoundrydb`, 사용자는 `sa`, 비밀번호는 없습니다.
+
+## 검증
+
+로컬과 GitHub Actions는 같은 Gradle Wrapper와 Java 21로 전체 테스트를 실행합니다.
+
+```bash
+./gradlew clean test --no-daemon
+```
+
+CI는 저장소 읽기 권한만 사용하고, 브랜치마다 이전 실행을 취소해 중복 실행을 줄입니다.
+Gradle과 GitHub Actions 의존성은 Dependabot이 매주 갱신 후보를 제안하며, 실제 반영은
+이 테스트를 통과한 변경만 검토합니다.
 
 ## 데모 계정
 
